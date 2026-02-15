@@ -1,35 +1,48 @@
-> **Note:** This repository contains Anthropic's implementation of skills for Claude. For information about the Agent Skills standard, see [agentskills.io](http://agentskills.io).
+> **Note:** This repository originated from Anthropic's implementation of skills for Claude, and is now documented to be broadly reusable across AI assistants. For information about the Agent Skills standard, see [agentskills.io](http://agentskills.io).
 
 # Skills
-Skills are folders of instructions, scripts, and resources that Claude loads dynamically to improve performance on specialized tasks. Skills teach Claude how to complete specific tasks in a repeatable way, whether that's creating documents with your company's brand guidelines, analyzing data using your organization's specific workflows, or automating personal tasks.
+Skills are folders of instructions, scripts, and resources that an AI assistant can load dynamically to improve performance on specialized tasks. Skills teach assistants how to complete specific tasks in a repeatable way, whether that's creating documents with your company's brand guidelines, analyzing data using your organization's specific workflows, or automating personal tasks.
 
 For more information, check out:
-- [What are skills?](https://support.claude.com/en/articles/12512176-what-are-skills)
-- [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude)
-- [How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills)
+- [Agent Skills Specification](./spec/agent-skills-spec.md)
+- [Anthropic: What are skills?](https://support.claude.com/en/articles/12512176-what-are-skills)
+- [Anthropic: Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude)
+- [Anthropic: How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills)
 - [Equipping agents for the real world with Agent Skills](https://anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 
 # About This Repository
 
-This repository contains skills that demonstrate what's possible with Claude's skills system. These skills range from creative applications (art, music, design) to technical tasks (testing web apps, MCP server generation) to enterprise workflows (communications, branding, etc.).
+This repository contains skills that demonstrate what is possible with an agent skills system. These skills range from creative applications (art, music, design) to technical tasks (testing web apps, MCP server generation) to enterprise workflows (communications, branding, etc.).
 
-Each skill is self-contained in its own folder with a `SKILL.md` file containing the instructions and metadata that Claude uses. Browse through these skills to get inspiration for your own skills or to understand different patterns and approaches.
+Each skill is self-contained in its own folder with a `SKILL.md` file containing the instructions and metadata that an AI assistant uses. Browse through these skills to get inspiration for your own skills or to understand different patterns and approaches.
 
 Many skills in this repo are open source (Apache 2.0). We've also included the document creation & editing skills that power [Claude's document capabilities](https://www.anthropic.com/news/create-files) under the hood in the [`skills/docx`](./skills/docx), [`skills/pdf`](./skills/pdf), [`skills/pptx`](./skills/pptx), and [`skills/xlsx`](./skills/xlsx) subfolders. These are source-available, not open source, but we wanted to share these with developers as a reference for more complex skills that are actively used in a production AI application.
 
+## Cross-Platform Compatibility Notes
+
+These skills are written to be portable:
+- Keep triggers in `description` model-agnostic (e.g., “use when editing DOCX with tracked changes”) instead of product-specific.
+- Prefer phrases like **"the assistant"**, **"the agent"**, or **"your AI runtime"** over vendor names unless an integration truly requires one.
+- Document provider-specific setup in clearly labeled sections (for example, "Claude-specific setup").
+- Keep reusable logic in scripts under `scripts/` so multiple AI environments can invoke the same deterministic workflow.
+
 ## Disclaimer
 
-**These skills are provided for demonstration and educational purposes only.** While some of these capabilities may be available in Claude, the implementations and behaviors you receive from Claude may differ from what is shown in these skills. These skills are meant to illustrate patterns and possibilities. Always test skills thoroughly in your own environment before relying on them for critical tasks.
+**These skills are provided for demonstration and educational purposes only.** Implementations and behaviors may differ by model, provider, orchestration framework, and runtime environment. These skills are meant to illustrate patterns and possibilities. Always test skills thoroughly in your own environment before relying on them for critical tasks.
 
 # Skill Sets
 - [./skills](./skills): Skill examples for Creative & Design, Development & Technical, Enterprise & Communication, and Document Skills
 - [./spec](./spec): The Agent Skills specification
 - [./template](./template): Skill template
 
-# Try in Claude Code, Claude.ai, and the API
+# Platform-specific setup examples
 
-## Claude Code
-You can register this repository as a Claude Code Plugin marketplace by running the following command in Claude Code:
+## Claude Code / Claude.ai / Claude API
+
+If you are using Claude products, you can use the following Anthropic-specific workflows.
+
+### Claude Code
+You can register this repository as a Claude Code Plugin marketplace by running:
 ```
 /plugin marketplace add anthropics/skills
 ```
@@ -40,23 +53,23 @@ Then, to install a specific set of skills:
 3. Select `document-skills` or `example-skills`
 4. Select `Install now`
 
-Alternatively, directly install either Plugin via:
+Alternatively, directly install either plugin via:
 ```
 /plugin install document-skills@anthropic-agent-skills
 /plugin install example-skills@anthropic-agent-skills
 ```
 
-After installing the plugin, you can use the skill by just mentioning it. For instance, if you install the `document-skills` plugin from the marketplace, you can ask Claude Code to do something like: "Use the PDF skill to extract the form fields from `path/to/some-file.pdf`"
+### Claude.ai
+These example skills are available to paid plans in Claude.ai.
 
-## Claude.ai
+To use any skill from this repository or upload custom skills, follow [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude#h_a4222fa77b).
 
-These example skills are all already available to paid plans in Claude.ai. 
+### Claude API
+You can use Anthropic's pre-built skills, and upload custom skills, via the Claude API. See the [Skills API Quickstart](https://docs.claude.com/en/api/skills-guide#creating-a-skill).
 
-To use any skill from this repository or upload custom skills, follow the instructions in [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude#h_a4222fa77b).
+## Other AI platforms
 
-## Claude API
-
-You can use Anthropic's pre-built skills, and upload custom skills, via the Claude API. See the [Skills API Quickstart](https://docs.claude.com/en/api/skills-guide#creating-a-skill) for more.
+For non-Claude environments, use the [Agent Skills specification](./spec/agent-skills-spec.md) and adapt integration points (triggering, packaging, and tool/runtime binding) to your target assistant framework.
 
 # Creating a Basic Skill
 
@@ -70,7 +83,7 @@ description: A clear description of what this skill does and when to use it
 
 # My Skill Name
 
-[Add your instructions here that Claude will follow when this skill is active]
+[Add your instructions here that the assistant will follow when this skill is active]
 
 ## Examples
 - Example usage 1
@@ -85,10 +98,10 @@ The frontmatter requires only two fields:
 - `name` - A unique identifier for your skill (lowercase, hyphens for spaces)
 - `description` - A complete description of what the skill does and when to use it
 
-The markdown content below contains the instructions, examples, and guidelines that Claude will follow. For more details, see [How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills).
+The markdown content below contains the instructions, examples, and guidelines the assistant will follow.
 
 # Partner Skills
 
-Skills are a great way to teach Claude how to get better at using specific pieces of software. As we see awesome example skills from partners, we may highlight some of them here:
+Skills are a great way to teach AI assistants how to get better at using specific pieces of software. As we see awesome example skills from partners, we may highlight some of them here:
 
 - **Notion** - [Notion Skills for Claude](https://www.notion.so/notiondevs/Notion-Skills-for-Claude-28da4445d27180c7af1df7d8615723d0)
